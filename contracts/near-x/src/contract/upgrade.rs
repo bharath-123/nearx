@@ -1,4 +1,3 @@
-use crate::constants::NEW_VALIDATOR_MAP;
 use crate::contract::*;
 use near_sdk::*;
 
@@ -15,18 +14,6 @@ impl NearxPool {
         require!(env::state_exists());
         let old_contract = env::state_read::<LegacyNearxPoolV4>().expect("ERR_NOT_INITIALIZED");
 
-        let mut new_validator_info_map = UnorderedMap::new(NEW_VALIDATOR_MAP.as_bytes());
-
-        for old_validator in old_contract.validator_info_map.values() {
-            let account_id = old_validator.account_id.clone();
-            let new_validator_info =
-                ValidatorInfoWrapper::LegacyValidatorInfo(old_validator).into_current();
-            new_validator_info_map.insert(
-                &account_id,
-                &ValidatorInfoWrapper::ValidatorInfo(new_validator_info),
-            );
-        }
-
         NearxPool {
             owner_account_id: old_contract.owner_account_id,
             total_staked: old_contract.total_staked,
@@ -38,7 +25,7 @@ impl NearxPool {
             reconciled_epoch_unstake_amount: old_contract.reconciled_epoch_unstake_amount,
             last_reconcilation_epoch: old_contract.last_reconcilation_epoch,
             accounts: old_contract.accounts,
-            validator_info_map: new_validator_info_map,
+            validator_info_map: old_contract.validator_info_map,
             total_validator_weight: old_contract.total_validator_weight,
             min_deposit_amount: old_contract.min_deposit_amount,
             operator_account_id: old_contract.operator_account_id,
