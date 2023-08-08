@@ -255,8 +255,6 @@ impl IntegrationTestContext<Sandbox> {
     }
 
     pub async fn run_epoch_methods(&self) -> anyhow::Result<()> {
-        let current_epoch = self.get_current_epoch().await?;
-
         println!("Running epoch methods!");
 
         let MAX_LOOP_COUNT: u32 = 3 * self.validator_count;
@@ -278,9 +276,9 @@ impl IntegrationTestContext<Sandbox> {
             let output = self.staking_epoch().await;
             if output.is_err() {
                 println!("epoch stake errored out!");
+                println!("epoch_stake output is {:?}", output.as_ref().unwrap());
                 break;
             }
-            println!("epoch_stake output is {:?}", output.as_ref().unwrap());
             res = output.unwrap().json::<bool>().unwrap();
             i += 1;
             if i >= MAX_LOOP_COUNT {

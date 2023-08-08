@@ -19,7 +19,7 @@ impl NearxPool {
     }
 
     fn assert_epoch_lock_not_held(&self) {
-        require!(!self.epoch_runner_lock, ERROR_EPOCH_RUNNER_LOCK_HELD)
+        require!(self.epoch_runner_lock == false, ERROR_EPOCH_RUNNER_LOCK_HELD)
     }
 
     // keep calling this method until false is return
@@ -88,6 +88,7 @@ impl NearxPool {
 
     #[private]
     pub fn on_stake_pool_deposit_and_stake(&mut self, validator_id: AccountId, amount: Balance) {
+        self.release_lock();
         let mut validator_info = self.internal_get_validator(&validator_id);
         if is_promise_success() {
             validator_info.staked += amount;
@@ -113,7 +114,6 @@ impl NearxPool {
         }
 
         self.internal_update_validator(&validator_id, &validator_info);
-        self.release_lock();
     }
 
     pub fn autocompounding_epoch(&mut self, validator: AccountId) {
@@ -169,6 +169,7 @@ impl NearxPool {
         validator_id: AccountId,
         #[callback] total_staked_balance: U128,
     ) -> PromiseOrValue<bool> {
+        self.release_lock();
         let mut validator_info = self.internal_get_validator(&validator_id);
 
         validator_info.last_redeemed_rewards_epoch = env::epoch_height();
@@ -213,14 +214,11 @@ impl NearxPool {
                 self.total_stake_shares += treasury_account_shares;
                 self.internal_update_account(&treasury_account_id, &treasury_account);
 
-                self.release_lock();
                 PromiseOrValue::Value(true)
             } else {
-                self.release_lock();
                 PromiseOrValue::Value(false)
             }
         } else {
-            self.release_lock();
             PromiseOrValue::Value(false)
         }
     }
@@ -293,6 +291,7 @@ impl NearxPool {
 
     #[private]
     pub fn on_stake_pool_unstake(&mut self, validator_id: AccountId, amount_to_unstake: u128) {
+        self.release_lock();
         let mut validator = self.internal_get_validator(&validator_id);
 
         if is_promise_success() {
@@ -323,7 +322,6 @@ impl NearxPool {
         }
 
         self.internal_update_validator(&validator_id, &validator);
-        self.release_lock();
     }
 
     pub fn withdraw_epoch(&mut self, validator: AccountId) {
@@ -436,6 +434,7 @@ impl NearxPool {
         validator_id: AccountId,
         #[callback] account: HumanReadableAccount,
     ) {
+        self.release_lock();
         let mut validator = self.internal_get_validator(&validator_id);
 
         let new_total_balance = account.staked_balance.0 + account.unstaked_balance.0;
@@ -467,7 +466,6 @@ impl NearxPool {
         validator.unstaked_amount = account.unstaked_balance.0;
 
         self.internal_update_validator(&validator_id, &validator);
-        self.release_lock();
     }
 
     #[private]
