@@ -212,6 +212,9 @@ pub enum Event {
         old_min_deposit: U128,
         new_min_deposit: U128,
     },
+    OverrideEpochRunnerLock {
+        epoch_lock: bool,
+    },
     UpdateRewardBuffer {
         amount_added: U128,
         new_reward_buffer: U128,

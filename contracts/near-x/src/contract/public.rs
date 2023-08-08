@@ -359,6 +359,16 @@ impl NearxPool {
     }
 
     #[payable]
+    pub fn override_epoch_runner_lock(&mut self) {
+        assert_one_yocto();
+        self.assert_operator_or_owner();
+        self.epoch_runner_lock = !self.epoch_runner_lock;
+        Event::OverrideEpochRunnerLock {
+            epoch_lock: self.epoch_runner_lock
+        }.emit()
+    }
+
+    #[payable]
     pub fn commit_owner(&mut self) {
         assert_one_yocto();
 
