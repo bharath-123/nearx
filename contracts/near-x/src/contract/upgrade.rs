@@ -13,7 +13,7 @@ impl NearxPool {
     #[private]
     pub fn migrate() -> Self {
         require!(env::state_exists());
-        let old_contract = env::state_read::<LegacyNearxPoolV3>().expect("ERR_NOT_INITIALIZED");
+        let old_contract = env::state_read::<LegacyNearxPoolV4>().expect("ERR_NOT_INITIALIZED");
 
         let mut new_validator_info_map = UnorderedMap::new(NEW_VALIDATOR_MAP.as_bytes());
 
@@ -53,7 +53,7 @@ impl NearxPool {
             last_reward_fee_set_epoch: old_contract.last_reward_fee_set_epoch,
             operations_control: OperationControls {
                 stake_paused: old_contract.operations_control.stake_paused,
-                direct_stake_paused: false,
+                direct_stake_paused: old_contract.operations_control.direct_stake_paused,
                 unstaked_paused: old_contract.operations_control.unstaked_paused,
                 withdraw_paused: old_contract.operations_control.withdraw_paused,
                 staking_epoch_paused: old_contract.operations_control.staking_epoch_paused,
@@ -68,6 +68,7 @@ impl NearxPool {
                 ft_transfer_paused: old_contract.operations_control.ft_transfer_paused,
                 ft_transfer_call_paused: old_contract.operations_control.ft_transfer_call_paused,
             },
+            epoch_runner_lock: false,
             min_storage_reserve: old_contract.min_storage_reserve,
         }
     }

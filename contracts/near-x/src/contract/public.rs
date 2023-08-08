@@ -77,6 +77,7 @@ impl NearxPool {
             rewards_buffer: 0,
             accumulated_rewards_buffer: 0,
             min_storage_reserve: 0,
+            epoch_runner_lock: false
         }
     }
 
