@@ -13,6 +13,7 @@ impl NearxPool {
     // keep calling this method until false is return
     pub fn staking_epoch(&mut self) -> bool {
         self.assert_staking_epoch_not_paused();
+        self.assert_operator_or_owner();
 
         let min_gas = gas::STAKING_EPOCH
             + gas::ON_STAKE_POOL_DEPOSIT_AND_STAKE
@@ -103,6 +104,7 @@ impl NearxPool {
 
     pub fn autocompounding_epoch(&mut self, validator: AccountId) {
         self.assert_autocompounding_epoch_not_paused();
+        self.assert_operator_or_owner();
 
         let min_gas = gas::AUTOCOMPOUNDING_EPOCH
             + gas::ON_STAKE_POOL_GET_ACCOUNT_STAKED_BALANCE
@@ -207,6 +209,7 @@ impl NearxPool {
 
     pub fn unstaking_epoch(&mut self) -> bool {
         self.assert_unstaking_epoch_not_paused();
+        self.assert_operator_or_owner();
 
         let min_gas =
             gas::UNSTAKING_EPOCH + gas::ON_STAKE_POOL_UNSTAKE + gas::ON_STAKE_POOL_UNSTAKE_CB;
@@ -305,6 +308,7 @@ impl NearxPool {
 
     pub fn withdraw_epoch(&mut self, validator: AccountId) {
         self.assert_epoch_withdraw_not_paused();
+        self.assert_operator_or_owner();
 
         // make sure enough gas was given
         let min_gas = gas::WITHDRAW_EPOCH
@@ -377,6 +381,7 @@ impl NearxPool {
 
     pub fn sync_balance_from_validator(&mut self, validator_id: AccountId) {
         self.assert_sync_validator_balance_not_paused();
+        self.assert_operator_or_owner();
 
         let min_gas = gas::SYNC_VALIDATOR_EPOCH
             + gas::ON_STAKE_POOL_GET_ACCOUNT_TOTAL_BALANCE
