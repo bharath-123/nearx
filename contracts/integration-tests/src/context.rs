@@ -255,8 +255,6 @@ impl IntegrationTestContext<Sandbox> {
     }
 
     pub async fn run_epoch_methods(&self) -> anyhow::Result<()> {
-        let current_epoch = self.get_current_epoch().await?;
-
         println!("Running epoch methods!");
 
         let MAX_LOOP_COUNT: u32 = 3 * self.validator_count;
@@ -543,16 +541,16 @@ impl IntegrationTestContext<Sandbox> {
     }
 
     pub async fn staking_epoch(&self) -> anyhow::Result<CallExecutionDetails> {
-        self.nearx_contract
-            .call(&self.worker, "staking_epoch")
+        self.nearx_operator
+            .call(&self.worker, self.nearx_contract.id(), "staking_epoch")
             .max_gas()
             .transact()
             .await
     }
 
     pub async fn unstaking_epoch(&self) -> anyhow::Result<CallExecutionDetails> {
-        self.nearx_contract
-            .call(&self.worker, "unstaking_epoch")
+        self.nearx_operator
+            .call(&self.worker, self.nearx_contract.id(), "unstaking_epoch")
             .max_gas()
             .transact()
             .await
@@ -574,8 +572,8 @@ impl IntegrationTestContext<Sandbox> {
         &self,
         validator: AccountId,
     ) -> anyhow::Result<CallExecutionDetails> {
-        self.nearx_contract
-            .call(&self.worker, "withdraw_epoch")
+        self.nearx_operator
+            .call(&self.worker, self.nearx_contract.id(), "withdraw_epoch")
             .max_gas()
             .args_json(json!({ "validator": validator }))?
             .transact()
@@ -598,8 +596,8 @@ impl IntegrationTestContext<Sandbox> {
         &self,
         validator: &AccountId,
     ) -> anyhow::Result<CallExecutionDetails> {
-        self.nearx_contract
-            .call(&self.worker, "autocompounding_epoch")
+        self.nearx_operator
+            .call(&self.worker, self.nearx_contract.id(), "autocompounding_epoch")
             .max_gas()
             .args_json(json!({ "validator": validator.clone() }))?
             .transact()
